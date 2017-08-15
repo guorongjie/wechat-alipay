@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<input type="hidden" name="img_name" id="img" style="width: 200px;height: 200px">
+<img id="img2" src=""/>
+<a onclick="uploadImg('img');" class="btn-bluejeans">
+    <i class="fa fa-upload" aria-hidden="true"></i>
+    <p>图片上传</p>
+</a>
+<form method="post" style="display: none;" id="uploadForm" action="uploadImg.php"
+      enctype="multipart/form-data">
+    <input type="file" id="file" name="uploadFile">
+    <input type="hidden" name="uploadPath" value="store">
+</form>
+</body>
+<script type="text/javascript" src="jquery.min.js"></script>
+<script type="text/javascript" src="jquery.form.js"></script>
+<script>
+    var loading = true;
+    function uploadImg(imgtype) {
+        //修改上传form参数
+        var upinput = $('#uploadForm>input[type="file"]');//获取真正提交的文件
+        upinput.click();//触发click事件
+        upinput.unbind('change');//触发change事件
+        upinput.change(function () {//change事件
+            if (loading) {
+                loading = false;
+                $("#uploadForm1").ajaxSubmit({//使用jquery.form 来ajax提交
+                    dataType: 'json',
+                    beforeSend: function () {
+                    },
+                    uploadProgress: function (event, position, total, percentComplete) {
+                    },
+                    success: function (data) {
+                        console.log(data);
+                        if (data.code == 200) {
+                            setpicurl(data.msg, imgtype);//返回赋值
+                            loading = true;
+                        } else {
+                            alert(data.msg);
+                            loading = true;
+                        }
+                    },
+                    error: function (xhr) {
+                        loading = true;
+                    }
+                });
+            }
+        })
+    }
+    function setpicurl(picurl, imgtype) {
+        $('#' + imgtype).val(picurl);
+        $('#' + imgtype + '2').attr('src', picurl + '?r=' + Math.random());
+    }
+</script>
+</html>
